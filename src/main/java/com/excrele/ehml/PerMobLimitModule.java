@@ -16,6 +16,7 @@ public class PerMobLimitModule implements Listener {
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
+    private final LoggerModule loggerModule;
     private final Logger logger;
     private final Map<EntityType, Integer> currentMobCounts;
 
@@ -23,10 +24,12 @@ public class PerMobLimitModule implements Listener {
      * Initializes the per-mob limit module.
      * @param plugin The main plugin instance for server access.
      * @param configManager The configuration manager providing settings.
+     * @param loggerModule The logger module for recording activities.
      */
-    public PerMobLimitModule(JavaPlugin plugin, ConfigManager configManager) {
+    public PerMobLimitModule(JavaPlugin plugin, ConfigManager configManager, LoggerModule loggerModule) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.loggerModule = loggerModule;
         this.logger = Logger.getLogger("EHML");
         this.currentMobCounts = new HashMap<>();
         updateMobCounts();
@@ -59,6 +62,8 @@ public class PerMobLimitModule implements Listener {
             if (currentCount >= limit) {
                 event.setCancelled(true);
                 logger.fine("Cancelled spawn of " + entityType + ": Mob-specific limit (" + limit + ") reached.");
+                loggerModule.log("PerMobLimit", "Cancelled spawn of " + entityType +
+                        " at " + event.getLocation() + ": Mob-specific limit (" + limit + ") reached.");
                 return;
             }
             // Increment count for this mob type

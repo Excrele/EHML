@@ -27,6 +27,7 @@ public class ConfigManager {
     private double deathMobCleanupRadius;
     private int deathMobThreshold;
     private double deathMobKillPercentage;
+    private boolean loggingEnabled;
 
     /**
      * Initializes the configuration manager.
@@ -115,10 +116,14 @@ public class ConfigManager {
             logger.warning("Invalid death-mob-kill-percentage in config, using default: 0.5");
         }
 
+        // Load logging settings
+        loggingEnabled = config.getBoolean("logging-enabled", true);
+
         logger.info("Loaded feature toggles: globalLimit=" + globalLimitEnabled +
                 ", mobLimits=" + mobLimitsEnabled +
                 ", lowHealthDelay=" + lowHealthDelayEnabled +
-                ", deathCleanup=" + deathCleanupEnabled);
+                ", deathCleanup=" + deathCleanupEnabled +
+                ", logging=" + loggingEnabled);
         logger.info("Loaded global hostile limit: " + globalHostileLimit);
         logger.info("Loaded mob-specific limits: " + mobLimits);
         logger.info("Loaded low-health settings: threshold=" + lowHealthThreshold +
@@ -136,6 +141,7 @@ public class ConfigManager {
         config.set("mob-limits-enabled", mobLimitsEnabled);
         config.set("low-health-delay-enabled", lowHealthDelayEnabled);
         config.set("death-cleanup-enabled", deathCleanupEnabled);
+        config.set("logging-enabled", loggingEnabled);
         plugin.saveConfig();
         logger.info("Configuration saved to config.yml");
     }
@@ -147,11 +153,23 @@ public class ConfigManager {
      */
     public void toggleFeature(String feature, boolean enabled) {
         switch (feature) {
-            case "global-limit" -> globalLimitEnabled = enabled;
-            case "mob-limits" -> mobLimitsEnabled = enabled;
-            case "low-health-delay" -> lowHealthDelayEnabled = enabled;
-            case "death-cleanup" -> deathCleanupEnabled = enabled;
-            default -> logger.warning("Attempted to toggle invalid feature: " + feature);
+            case "global-limit":
+                globalLimitEnabled = enabled;
+                break;
+            case "mob-limits":
+                mobLimitsEnabled = enabled;
+                break;
+            case "low-health-delay":
+                lowHealthDelayEnabled = enabled;
+                break;
+            case "death-cleanup":
+                deathCleanupEnabled = enabled;
+                break;
+            case "logging":
+                loggingEnabled = enabled;
+                break;
+            default:
+                logger.warning("Attempted to toggle invalid feature: " + feature);
         }
         saveConfig();
     }
@@ -185,4 +203,5 @@ public class ConfigManager {
     public double getDeathMobCleanupRadius() { return deathMobCleanupRadius; }
     public int getDeathMobThreshold() { return deathMobThreshold; }
     public double getDeathMobKillPercentage() { return deathMobKillPercentage; }
+    public boolean isLoggingEnabled() { return loggingEnabled; }
 }

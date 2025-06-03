@@ -13,16 +13,19 @@ public class GlobalLimitModule implements Listener {
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
+    private final LoggerModule loggerModule;
     private final Logger logger;
 
     /**
      * Initializes the global limit module.
      * @param plugin The main plugin instance for server access.
      * @param configManager The configuration manager providing settings.
+     * @param loggerModule The logger module for recording activities.
      */
-    public GlobalLimitModule(JavaPlugin plugin, ConfigManager configManager) {
+    public GlobalLimitModule(JavaPlugin plugin, ConfigManager configManager, LoggerModule loggerModule) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.loggerModule = loggerModule;
         this.logger = Logger.getLogger("EHML");
     }
 
@@ -56,6 +59,9 @@ public class GlobalLimitModule implements Listener {
         if (currentHostileCount >= configManager.getGlobalHostileLimit()) {
             event.setCancelled(true);
             logger.fine("Cancelled spawn of " + event.getEntityType() + ": Global limit (" +
+                    configManager.getGlobalHostileLimit() + ") reached.");
+            loggerModule.log("GlobalLimit", "Cancelled spawn of " + event.getEntityType() +
+                    " at " + event.getLocation() + ": Global limit (" +
                     configManager.getGlobalHostileLimit() + ") reached.");
         }
     }

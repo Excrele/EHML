@@ -16,15 +16,18 @@ import java.util.logging.Logger;
 public class LowHealthDelayModule implements Listener {
 
     private final ConfigManager configManager;
+    private final LoggerModule loggerModule;
     private final Logger logger;
     private final Map<UUID, Long> lastSpawnTimes;
 
     /**
      * Initializes the low-health delay module.
      * @param configManager The configuration manager providing settings.
+     * @param loggerModule The logger module for recording activities.
      */
-    public LowHealthDelayModule(ConfigManager configManager) {
+    public LowHealthDelayModule(ConfigManager configManager, LoggerModule loggerModule) {
         this.configManager = configManager;
+        this.loggerModule = loggerModule;
         this.logger = Logger.getLogger("EHML");
         this.lastSpawnTimes = new HashMap<>();
     }
@@ -59,6 +62,8 @@ public class LowHealthDelayModule implements Listener {
             if (Math.random() < configManager.getSpawnDelayChance()) {
                 event.setCancelled(true);
                 logger.fine("Cancelled spawn of " + event.getEntityType() + " near low-health player at " + spawnLocation);
+                loggerModule.log("LowHealthDelay", "Cancelled spawn of " + event.getEntityType() +
+                        " near low-health player at " + spawnLocation);
                 lastSpawnTimes.put(UUID.nameUUIDFromBytes(chunkKey.getBytes()), currentTime);
             }
         }

@@ -21,6 +21,7 @@ public class GUIManager implements CommandExecutor {
 
     private final EHML plugin;
     private final ConfigManager configManager;
+    private final LoggerModule loggerModule;
     private static final String GUI_TITLE = ChatColor.DARK_GRAY + "EHML Settings";
     private final NamespacedKey featureKey;
 
@@ -28,10 +29,12 @@ public class GUIManager implements CommandExecutor {
      * Initializes the GUI manager.
      * @param plugin The main plugin instance.
      * @param configManager The configuration manager.
+     * @param loggerModule The logger module for recording activities.
      */
-    public GUIManager(EHML plugin, ConfigManager configManager) {
+    public GUIManager(EHML plugin, ConfigManager configManager, LoggerModule loggerModule) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.loggerModule = loggerModule;
         this.featureKey = new NamespacedKey(plugin, "ehml_feature");
     }
 
@@ -57,6 +60,7 @@ public class GUIManager implements CommandExecutor {
         }
 
         openGUI(player);
+        loggerModule.log("GUI", "Player " + player.getName() + " opened EHML GUI.");
         return true;
     }
 
@@ -68,24 +72,29 @@ public class GUIManager implements CommandExecutor {
         Inventory gui = Bukkit.createInventory(null, 9, GUI_TITLE);
 
         // Global Limit Toggle
-        gui.setItem(1, createToggleItem(Material.DIAMOND_SWORD, "Global Limit",
+        gui.setItem(0, createToggleItem(Material.DIAMOND_SWORD, "Global Limit",
                 configManager.isGlobalLimitEnabled(), "global-limit",
                 "Toggles the global hostile mob limit."));
 
         // Per-Mob Limits Toggle
-        gui.setItem(3, createToggleItem(Material.BOW, "Per-Mob Limits",
+        gui.setItem(2, createToggleItem(Material.BOW, "Per-Mob Limits",
                 configManager.isMobLimitsEnabled(), "mob-limits",
                 "Toggles per-mob-type spawn limits."));
 
         // Low-Health Delay Toggle
-        gui.setItem(5, createToggleItem(Material.POTION, "Low-Health Delay",
+        gui.setItem(4, createToggleItem(Material.POTION, "Low-Health Delay",
                 configManager.isLowHealthDelayEnabled(), "low-health-delay",
                 "Toggles spawn delay near low-health players."));
 
         // Death Cleanup Toggle
-        gui.setItem(7, createToggleItem(Material.PLAYER_HEAD, "Death Cleanup",
+        gui.setItem(6, createToggleItem(Material.PLAYER_HEAD, "Death Cleanup",
                 configManager.isDeathCleanupEnabled(), "death-cleanup",
                 "Toggles mob cleanup on player death."));
+
+        // Logging Toggle
+        gui.setItem(8, createToggleItem(Material.WRITABLE_BOOK, "Logging",
+                configManager.isLoggingEnabled(), "logging",
+                "Toggles activity logging to YAML file."));
 
         player.openInventory(gui);
     }
@@ -139,12 +148,17 @@ public class GUIManager implements CommandExecutor {
                 newState = !configManager.isDeathCleanupEnabled();
                 configManager.toggleFeature("death-cleanup", newState);
                 break;
+            case "logging":
+                newState = !configManager.isLoggingEnabled();
+                configManager.toggleFeature("logging", newState);
+                break;
             default:
                 player.sendMessage("§cInvalid feature: " + feature);
                 return;
         }
         plugin.reload();
         player.sendMessage("§a" + feature.replace("-", " ") + " is now " + (newState ? "enabled" : "disabled"));
+        loggerModule.log("GUI", "Player " + player.getName() + " toggled " + feature + " to " + (newState ? "enabled" : "disabled"));
         openGUI(player); // Refresh GUI
     }
 

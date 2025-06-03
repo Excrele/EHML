@@ -12,16 +12,19 @@ public class ReloadCommand implements CommandExecutor {
 
     private final EHML plugin;
     private final ConfigManager configManager;
+    private final LoggerModule loggerModule;
     private final Logger logger;
 
     /**
      * Initializes the reload command.
      * @param plugin The main plugin instance.
      * @param configManager The configuration manager.
+     * @param loggerModule The logger module for recording activities.
      */
-    public ReloadCommand(EHML plugin, ConfigManager configManager) {
+    public ReloadCommand(EHML plugin, ConfigManager configManager, LoggerModule loggerModule) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.loggerModule = loggerModule;
         this.logger = Logger.getLogger("EHML");
     }
 
@@ -43,6 +46,7 @@ public class ReloadCommand implements CommandExecutor {
             plugin.reload();
             sender.sendMessage("§aEHML configuration reloaded successfully.");
             logger.info("Configuration reloaded by " + sender.getName());
+            loggerModule.log("ReloadCommand", "Configuration reloaded by " + sender.getName());
             return true;
         }
         sender.sendMessage("§cUsage: /ehml reload");

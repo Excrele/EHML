@@ -11,19 +11,22 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
- * Module for cleaning up hostile devices near a player's death location.
+ * Module for cleaning up hostile mobs near a player's death location.
  */
 public class DeathCleanupModule implements Listener {
 
     private final ConfigManager configManager;
+    private final LoggerModule loggerModule;
     private final Logger logger;
 
     /**
      * Initializes the death cleanup module.
      * @param configManager The configuration manager providing settings.
+     * @param loggerModule The logger module for recording activities.
      */
-    public DeathCleanupModule(ConfigManager configManager) {
+    public DeathCleanupModule(ConfigManager configManager, LoggerModule loggerModule) {
         this.configManager = configManager;
+        this.loggerModule = loggerModule;
         this.logger = Logger.getLogger("EHML");
     }
 
@@ -54,8 +57,11 @@ public class DeathCleanupModule implements Listener {
                 EntityType type = mob.getType();
                 mob.remove();
                 logger.fine("Removed " + type + " at " + mob.getLocation() + " due to player death at " + deathLocation);
+                loggerModule.log("DeathCleanup", "Removed " + type + " at " + mob.getLocation() +
+                        " due to player death at " + deathLocation);
             }
             logger.info("Removed " + mobsToKill + " hostile mobs near player death at " + deathLocation);
+            loggerModule.log("DeathCleanup", "Removed " + mobsToKill + " hostile mobs near player death at " + deathLocation);
         }
     }
 

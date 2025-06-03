@@ -6,14 +6,16 @@ import java.util.logging.Logger;
 
 /**
  * Main class for Excrele's Hostile Mob Limiter (EHML) plugin for Spigot 1.21.5.
- * Orchestrates modular components for controlling hostile mob spawns and handling mob cleanup.
- * Features include global and per-mob-type spawn limits, low-health spawn delay, mob cleanup on player death,
- * a configuration reload command, and an in-game GUI for toggling features.
+ * Orchestrates modular components for controlling hostile mob spawns, handling mob cleanup,
+ * and logging activities. Features include global and per-mob-type spawn limits, low-health
+ * spawn delay, mob cleanup on player death, an in-game GUI for toggling features, and a
+ * configuration reload command.
  */
 public class EHML extends JavaPlugin {
 
     private static final Logger LOGGER = Logger.getLogger("EHML");
     private ConfigManager configManager;
+    private LoggerModule loggerModule;
     private GlobalLimitModule globalLimitModule;
     private PerMobLimitModule perMobLimitModule;
     private LowHealthDelayModule lowHealthDelayModule;
@@ -29,12 +31,16 @@ public class EHML extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.loadConfig();
 
+        // Initialize logger module
+        loggerModule = new LoggerModule(this, configManager);
+        loggerModule.log("Server", "EHML plugin enabled.");
+
         // Initialize modules
-        globalLimitModule = new GlobalLimitModule(this, configManager);
-        perMobLimitModule = new PerMobLimitModule(this, configManager);
-        lowHealthDelayModule = new LowHealthDelayModule(configManager);
-        deathCleanupModule = new DeathCleanupModule(configManager);
-        guiManager = new GUIManager(this, configManager);
+        globalLimitModule = new GlobalLimitModule(this, configManager, loggerModule);
+        perMobLimitModule = new PerMobLimitModule(this, configManager, loggerModule);
+        lowHealthDelayModule = new LowHealthDelayModule(configManager, loggerModule);
+        deathCleanupModule = new DeathCleanupModule(configManager, loggerModule);
+        guiManager = new GUIManager(this, configManager, loggerModule);
 
         // Register event listeners
         registerListener(globalLimitModule);
@@ -44,7 +50,7 @@ public class EHML extends JavaPlugin {
         registerListener(new GUIListener(guiManager));
 
         // Register commands
-        getCommand("ehml").setExecutor(new ReloadCommand(this, configManager));
+        getCommand("ehml").setExecutor(new ReloadCommand(this, configManager, loggerModule));
         getCommand("ehmlgui").setExecutor(guiManager);
 
         LOGGER.info("EHML enabled successfully.");
@@ -55,6 +61,8 @@ public class EHML extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        loggerModule.log("Server", "EHML plugin disabled.");
+        loggerModule.close();
         LOGGER.info("EHML disabled.");
     }
 
@@ -75,6 +83,7 @@ public class EHML extends JavaPlugin {
         perMobLimitModule.reload();
         lowHealthDelayModule.reload();
         deathCleanupModule.reload();
+        loggerModule.log("Server", "EHML configuration reloaded.");
         LOGGER.info("EHML configuration reloaded.");
     }
 }
