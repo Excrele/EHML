@@ -1,0 +1,29 @@
+# Excrele's Hostile Mob Limiter (EHML) configuration file
+
+# Global hostile mob limit settings
+global-limit-enabled: true     # Enable/disable global hostile mob limit
+global-hostile-limit: 70       # Global limit for all hostile mobs in loaded chunks
+
+# Per-mob-type limits settings
+mob-limits-enabled: true       # Enable/disable per-mob-type limits
+mob-limits:
+  zombie: 20
+  skeleton: 15
+  creeper: 10
+  spider: 10
+  enderman: 5
+  # Add other hostile mobs as needed, e.g.:
+  # witch: 5
+  # pillager: 8
+
+# Low-health spawn delay settings
+low-health-delay-enabled: true # Enable/disable low-health spawn delay
+low-health-threshold: 5.0      # Player health threshold (out of 20.0, e.g., 5.0 = 2.5 hearts)
+spawn-delay-radius: 30.0       # Radius to check for low-health players (blocks)
+spawn-delay-chance: 0.5        # Chance to cancel spawn near low-health players (0.0 to 1.0)
+
+# Player death mob cleanup settings
+death-cleanup-enabled: true    # Enable/disable mob cleanup on player death
+death-mob-cleanup-radius: 10.0 # Radius to check for hostile mobs on player death (blocks)
+death-mob-threshold: 5         # Number of hostile mobs required to trigger cleanup
+death-mob-kill-percentage: 0.5 # Percentage of hostile mobs to kill (0.0 to 1.0)

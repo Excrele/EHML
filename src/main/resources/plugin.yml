@@ -1,0 +1,21 @@
+name: EHML
+version: 2.0
+main: com.excrele.ehml.EHML
+api-version: 1.21
+description: Excrele's Modular Hostile Mob Limiter plugin to limit hostile mobs with configurable GUI, global limit, per-mob-type limits, low-health spawn delay, mob cleanup on player death, and config reload command.
+commands:
+  ehml:
+    description: Reloads the EHML configuration
+    usage: /<command> reload
+    permission: ehml.reload
+  ehmlgui:
+    description: Opens the EHML settings GUI
+    usage: /<command>
+    permission: ehml.gui
+permissions:
+  ehml.reload:
+    description: Allows reloading the EHML configuration
+    default: op
+  ehml.gui:
+    description: Allows opening the EHML settings GUI
+    default: op
